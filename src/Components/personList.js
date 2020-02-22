@@ -14,7 +14,7 @@ export default class PersonList extends React.Component {
   };
 
   isBottom(el) {
-    return el.getBoundingClientRect().bottom <= window.innerHeight;
+    return Math.floor(el.getBoundingClientRect().bottom) <= Math.floor(window.innerHeight);
   }
 
   trackScrolling(e) {
