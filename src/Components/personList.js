@@ -1,32 +1,41 @@
 import React from 'react';
 import axios from 'axios';
 import Person from './person';
+import image from '../media/img/sad_face.PNG';
+
 
 export default class PersonList extends React.Component {
   constructor(props) {
     super(props);
-    this.trackScrolling = this.trackScrolling.bind(this);
+    this.handleBottomReach = this.handleBottomReach.bind(this);
     this.state = {
       persons: [],
       hasTouchedBottom: false,
-      scrollCount: 0
+      scrollCount: 0,
+      fetchCount: 0,
+      endPerson: {
+        first_name: 'No more user!',
+        last_name: '',
+        avatar: image
+      }
     };
   };
 
   isBottom(el) {
-    return Math.floor(el.getBoundingClientRect().bottom) <= Math.floor(window.innerHeight);
+    return Math.floor(el.getBoundingClientRect().bottom * 0.8) <= Math.floor(window.innerHeight);
   }
 
-  trackScrolling(e) {
-    this.setState((prevState) => {
-      return {
-        scrollCount: prevState.scrollCount + 1
-      };
-    });
+  handleBottomReach(e) {
     const rootDiv = document.getElementById('root');
-    if (this.isBottom(rootDiv)) {
-      this.getNewUsers();
+    if(this.state.fetchCount <= 5) {
+      if (this.isBottom(rootDiv)) {
+        this.getNewUsers();
+      }
+    } else {
+      document.removeEventListener('scroll', this.handleBottomReach);
+      window.removeEventListener('resize', this.handleBottomReach);
     }
+    
   }
 
   getNewUsers() {
@@ -34,7 +43,8 @@ export default class PersonList extends React.Component {
     .then(res => {
       this.setState((prevState) => {
         return {
-          persons: prevState.persons.concat(res.data.data)
+          persons: prevState.persons.concat(res.data.data),
+          fetchCount: prevState.fetchCount + 1
         };
       });
       if (!(document.getElementById('root').clientHeight >= document.documentElement.clientHeight)) {
@@ -45,14 +55,15 @@ export default class PersonList extends React.Component {
 
   componentDidMount() {
     this.getNewUsers();
-    document.addEventListener('scroll', this.trackScrolling);
+    document.addEventListener('scroll', this.handleBottomReach);
+    window.addEventListener('resize', this.handleBottomReach);
   }
 
   render() {
     return (
-      <div>
-        <h2 style={{position: 'fixed'}}>{this.state.scrollCount}</h2>
+      <div id="personList">
         {this.state.persons && this.state.persons.map((person, index) => <Person key={index} person={person}/>)}
+        {(this.state.fetchCount && this.state.fetchCount > 5) && <Person key='End' person={this.state.endPerson}/>}
       </div>
     )
   }
