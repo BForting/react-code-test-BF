@@ -3,33 +3,36 @@ import React from 'react';
 export default class Person extends React.Component {
 	constructor(props) {
 		super(props);
-		this.componentDidMount = this.componentDidMount.bind(this);
-		this.state = {
-			fullName: ''
-		};
+		this.handleRemove = this.handleRemove.bind(this);
 	}
 
-	componentDidMount() {
-		this.setState(() => {
-			return {
-				fullName:
-					this.props.person.first_name + ' ' + this.props.person.last_name
-			};
-		});
+	handleRemove() {
+		this.props.handleRemove(this._reactInternalFiber.key);
 	}
 
 	render() {
+		const full_name =
+			this.props.person.first_name + ' ' + this.props.person.last_name;
 		return (
 			<div className="flex">
 				<div className="person-card">
 					<img
 						src={this.props.person.avatar}
-						alt={this.state.fullName}
+						alt={full_name}
 						className="avatar"
 					/>
-					<p className="fullName">{this.state.fullName}</p>
+					<div className="fullName">
+						<p>{full_name}</p>
+						{full_name !== 'No more user! ' && (
+							<button
+								className="remove-single custom-button"
+								onClick={this.handleRemove}
+							>
+								Remove
+							</button>
+						)}
+					</div>
 				</div>
-				{/* <hr /> */}
 			</div>
 		);
 	}
