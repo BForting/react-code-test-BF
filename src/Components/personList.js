@@ -4,6 +4,8 @@ import Person from './person';
 import image from '../media/img/sad_face.PNG';
 
 export default class PersonList extends React.Component {
+	// We make sure to bind our methods that need to access the state when called
+	// We set the variables and state we need to handle the user data
 	constructor(props) {
 		super(props);
 		this.handleBottomReach = this.handleBottomReach.bind(this);
@@ -18,7 +20,6 @@ export default class PersonList extends React.Component {
 			scrollCount: 0,
 			page: 1,
 			hasMoreData: true,
-			lockFetch: false,
 			endPerson: {
 				first_name: 'No more user!',
 				last_name: '',
@@ -27,6 +28,8 @@ export default class PersonList extends React.Component {
 		};
 	}
 
+	// We check if the DOM element has reached the bottom of the screen
+	// We also tweak the size to 80% of its real size so the user don't bump on the end of the window
 	isBottom(el) {
 		return (
 			Math.floor(el.getBoundingClientRect().bottom * 0.8) <=
@@ -34,6 +37,7 @@ export default class PersonList extends React.Component {
 		);
 	}
 
+	// If our DOM element didn't reach the bottom of the screen, we fetch more data
 	handleBottomReach(e) {
 		const rootDiv = document.getElementById('root');
 		if (this.isBottom(rootDiv)) {
@@ -41,6 +45,9 @@ export default class PersonList extends React.Component {
 		}
 	}
 
+	// We fetch data on the reqres API
+	// The lockFetch variable makes sure that we don't fire to many API calls when there is no more data to fetch
+	// Though we don't block it entirely in case the database is updated while the user is navigating
 	getNewUsers() {
 		if (this.lockFetch) return;
 		this.lockFetch = true;
@@ -79,6 +86,7 @@ export default class PersonList extends React.Component {
 			});
 	}
 
+	// We set a method to send our child component to remove a single User
 	handleRemove(id) {
 		this.setState(prevState => {
 			prevState.persons.splice(id, 1);
@@ -88,6 +96,7 @@ export default class PersonList extends React.Component {
 		});
 	}
 
+	// We set a method to remove all the Users
 	handleRemoveAll() {
 		this.setState(() => {
 			return {
@@ -98,19 +107,21 @@ export default class PersonList extends React.Component {
 		});
 	}
 
+	// We fetch our first data and add Event listener on scroll and resize
 	componentDidMount() {
 		this.getNewUsers();
 		document.addEventListener('scroll', this.handleBottomReach);
 		window.addEventListener('resize', this.handleBottomReach);
 	}
 
+	// We make sure to remove the events when the component is unmounted
 	componentWillUnmount() {
 		document.removeEventListener('scroll', this.handleBottomReach);
 		window.removeEventListener('resize', this.handleBottomReach);
 	}
 
+	// We display the interface based on the content of the persons variable in the state
 	render() {
-		console.log(this.state.persons);
 		return (
 			<div id="personList">
 				{this.state.persons.length !== 0 && (
