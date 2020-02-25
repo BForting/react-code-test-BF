@@ -172,10 +172,15 @@ body {
 
 /* We handle the different screen sizes by changin the size of our "person-card" class elements */
 
-@media screen and (min-width: 640px) {
+@media screen and (min-width: 530px) {
 	.person-card {
-		align-self: center;
-		width: 40%;
+		width: 60%;
+	}
+}
+
+@media screen and (min-width: 740px) {
+	.person-card {
+		width: 50%;
 	}
 }
 
